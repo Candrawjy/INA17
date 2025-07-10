@@ -1,0 +1,98 @@
+basePath: /
+definitions:
+  model.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  model.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  model.PaymentRequest:
+    properties:
+      amount:
+        type: integer
+      booking_id:
+        type: integer
+    type: object
+  model.PaymentStatusResponse:
+    properties:
+      status:
+        type: string
+    type: object
+host: localhost:8003
+info:
+  contact:
+    email: dev@example.com
+    name: Developer Team
+  description: This is the payment microservice API for processing and checking payments.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Payment Service API
+  version: "1.0"
+paths:
+  /pay:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Payment Data
+        in: body
+        name: payment
+        required: true
+        schema:
+          $ref: '#/definitions/model.PaymentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Process payment
+      tags:
+      - Payment
+  /status/{booking_id}:
+    get:
+      parameters:
+      - description: Booking ID
+        in: path
+        name: booking_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.PaymentStatusResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get payment status by booking ID
+      tags:
+      - Payment
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

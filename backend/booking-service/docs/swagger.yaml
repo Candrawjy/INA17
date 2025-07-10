@@ -1,0 +1,289 @@
+basePath: /
+definitions:
+  model.BookingResponse:
+    properties:
+      concert:
+        type: string
+      id:
+        type: integer
+      price:
+        type: integer
+      quantity:
+        type: integer
+      time:
+        type: string
+    type: object
+  model.Concert:
+    properties:
+      available_tickets:
+        type: integer
+      date:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+    type: object
+  model.ErrorResponse:
+    properties:
+      error:
+        example: Invalid input
+        type: string
+    type: object
+  model.MessageResponse:
+    properties:
+      message:
+        example: Success
+        type: string
+    type: object
+host: localhost:8002
+info:
+  contact: {}
+  description: API untuk pemesanan tiket konser
+  title: Booking Service API
+  version: "1.0"
+paths:
+  /admin/concerts:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Concert'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get all concerts (admin)
+      tags:
+      - Admin
+  /book:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Booking info
+        in: body
+        name: booking
+        required: true
+        schema:
+          additionalProperties:
+            type: integer
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Book concert tickets
+      tags:
+      - Booking
+  /concert/{id}:
+    get:
+      parameters:
+      - description: Concert ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Concert'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get concert details by ID
+      tags:
+      - Concerts
+  /concerts:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Concert'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get active concerts
+      tags:
+      - Concerts
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Concert data
+        in: body
+        name: concert
+        required: true
+        schema:
+          $ref: '#/definitions/model.Concert'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Create a new concert
+      tags:
+      - Concerts
+  /concerts/{id}:
+    delete:
+      parameters:
+      - description: Concert ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Delete concert by ID
+      tags:
+      - Concerts
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Concert ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated concert data
+        in: body
+        name: concert
+        required: true
+        schema:
+          $ref: '#/definitions/model.Concert'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Update concert by ID
+      tags:
+      - Concerts
+  /concerts/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Concert ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Status update
+        in: body
+        name: status
+        required: true
+        schema:
+          additionalProperties:
+            type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Update status of concert
+      tags:
+      - Concerts
+  /my-bookings:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.BookingResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user bookings
+      tags:
+      - Booking
+schemes:
+- http
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
